@@ -324,10 +324,10 @@ def draw_bridge(draw, x, y, scale, fill):
 
 
 # ==========================
-# 本地版 Q版IP 生成函数
+# 盲盒潮玩风 IP 生成函数
 # ==========================
 
-def create_local_ip_image(memory):
+def create_blindbox_ip_image(memory):
     scene = memory["scene"]
     identity = memory.get("type", "").strip()
     if identity == "":
@@ -339,32 +339,40 @@ def create_local_ip_image(memory):
 
     palettes = {
         "山静": {
-            "main": (27, 104, 95),
+            "main": (38, 109, 95),
             "accent": (214, 168, 79),
-            "bg_top": (243, 249, 244),
-            "bg_bottom": (232, 240, 235),
-            "deco": (196, 221, 205),
+            "bg_top": (242, 248, 244),
+            "bg_bottom": (228, 238, 233),
+            "deco": (196, 218, 206),
+            "role_name": "山城守望者",
+            "badge": "MOUNTAIN SERIES"
         },
         "水生": {
-            "main": (45, 118, 177),
-            "accent": (112, 192, 232),
-            "bg_top": (240, 248, 253),
-            "bg_bottom": (225, 239, 248),
-            "deco": (190, 220, 241),
+            "main": (48, 123, 188),
+            "accent": (104, 190, 232),
+            "bg_top": (241, 248, 254),
+            "bg_bottom": (225, 238, 249),
+            "deco": (189, 220, 242),
+            "role_name": "江流精灵",
+            "badge": "RIVER SERIES"
         },
         "人聚": {
-            "main": (126, 74, 136),
-            "accent": (232, 126, 92),
-            "bg_top": (251, 244, 247),
-            "bg_bottom": (246, 233, 239),
-            "deco": (231, 204, 220),
+            "main": (129, 83, 142),
+            "accent": (232, 132, 97),
+            "bg_top": (250, 244, 247),
+            "bg_bottom": (245, 233, 240),
+            "deco": (230, 206, 221),
+            "role_name": "烟火生活家",
+            "badge": "LIFE SERIES"
         },
         "城兴": {
-            "main": (31, 92, 115),
-            "accent": (233, 167, 79),
-            "bg_top": (243, 247, 250),
-            "bg_bottom": (232, 238, 243),
-            "deco": (202, 214, 223),
+            "main": (33, 95, 118),
+            "accent": (233, 169, 84),
+            "bg_top": (242, 247, 250),
+            "bg_bottom": (230, 237, 243),
+            "deco": (203, 214, 224),
+            "role_name": "港湾未来使",
+            "badge": "CITY SERIES"
         }
     }
 
@@ -374,11 +382,14 @@ def create_local_ip_image(memory):
     bg_top = p["bg_top"]
     bg_bottom = p["bg_bottom"]
     deco = p["deco"]
+    role_name = p["role_name"]
+    badge_text = p["badge"]
 
     photo_color = extract_main_color(memory["image"])
-    outfit_color = mix_color(main, photo_color, 0.35)
-    hair_color = darken(mix_color(photo_color, (70, 55, 45), 0.35), 0.1)
-    skin_color = (250, 226, 203)
+    outfit_color = mix_color(main, photo_color, 0.28)
+    hair_color = darken(mix_color(photo_color, (75, 60, 48), 0.35), 0.08)
+    skin_color = (250, 227, 205)
+    base_shadow = lighten(deco, 0.15)
 
     w, h = 1600, 2000
     canvas = Image.new("RGB", (w, h), "white")
@@ -388,154 +399,200 @@ def create_local_ip_image(memory):
 
     draw.rounded_rectangle(
         (70, 60, 1530, 1940),
-        radius=42,
+        radius=46,
         fill=(248, 245, 238),
-        outline=(228, 219, 206),
+        outline=(229, 220, 208),
         width=3
     )
 
     draw.rounded_rectangle(
-        (120, 110, 1480, 330),
-        radius=32,
+        (120, 110, 1480, 320),
+        radius=34,
         fill=(255, 255, 255),
         outline=rgb_hex(deco),
         width=2
     )
 
-    title_font = get_font(68, bold=True)
-    sub_font = get_font(30, bold=True)
+    title_font = get_font(64, bold=True)
+    sub_font = get_font(28, bold=True)
     text_font = get_font(30, bold=False)
-    chip_font = get_font(28, bold=True)
+    chip_font = get_font(26, bold=True)
     section_font = get_font(40, bold=True)
     small_font = get_font(24, bold=False)
+    role_font = get_font(54, bold=True)
 
-    draw.text((170, 155), "我的万州专属IP形象", font=title_font, fill=main)
-    draw.text((172, 240), "本地模板生成版 · 可爱 Q 版文旅角色", font=sub_font, fill=accent)
+    draw.text((165, 150), "万州专属IP · 盲盒潮玩款", font=title_font, fill=main)
+    draw.text((170, 232), "Wanzhou Blind Box Character", font=sub_font, fill=accent)
 
-    chip_text = f"{scene}｜{identity[:12] + ('...' if len(identity) > 12 else '')}"
     draw.rounded_rectangle(
-        (1010, 168, 1410, 228),
+        (1115, 155, 1425, 220),
         radius=24,
+        fill=lighten(accent, 0.82),
+        outline=accent,
+        width=2
+    )
+    draw_centered_text(draw, (1115, 155, 1425, 220), badge_text, chip_font, main)
+
+    draw.rounded_rectangle(
+        (128, 128, 255, 185),
+        radius=18,
+        fill=lighten(main, 0.78),
+        outline=main,
+        width=2
+    )
+    draw_centered_text(draw, (128, 128, 255, 185), f"{scene}款", chip_font, main)
+
+    photo = Image.open(BytesIO(memory["image"])).convert("RGB")
+    photo_thumb = ImageOps.exif_transpose(photo)
+    photo_thumb = ImageOps.fit(photo_thumb, (180, 180), method=Image.Resampling.LANCZOS)
+    photo_thumb = add_rounded_corners(photo_thumb, 28)
+
+    draw.rounded_rectangle(
+        (1240, 390, 1450, 625),
+        radius=30,
+        fill=(255, 255, 255),
+        outline=rgb_hex(deco),
+        width=2
+    )
+    canvas.paste(photo_thumb, (1255, 405), photo_thumb)
+    draw.text((1280, 595), "灵感照片", font=small_font, fill=main)
+
+    draw.rounded_rectangle(
+        (140, 360, 1460, 1335),
+        radius=42,
+        fill=(255, 255, 255),
+        outline=rgb_hex(deco),
+        width=2
+    )
+
+    draw.text((180, 392), role_name, font=role_font, fill=main)
+
+    draw.ellipse((485, 1085, 1115, 1190), fill=base_shadow)
+
+    for i in range(6):
+        x = 190 + i * 185
+        draw.ellipse((x, 490, x + 72, 562), fill=lighten(deco, 0.28))
+
+    if scene == "山静":
+        draw_cloud(draw, 240, 500, 1.0, lighten(deco, 0.45))
+        draw_cloud(draw, 1060, 535, 0.9, lighten(deco, 0.45))
+        draw_mountain(draw, 230, 1130, 1.0, lighten(main, 0.58))
+        draw_mountain(draw, 980, 1130, 0.8, lighten(main, 0.68))
+    elif scene == "水生":
+        draw_wave(draw, 220, 1135, 1.45, lighten(main, 0.54))
+        draw_wave(draw, 940, 1130, 1.0, lighten(main, 0.68))
+        draw_cloud(draw, 260, 510, 0.95, lighten(deco, 0.48))
+    elif scene == "人聚":
+        draw_cloud(draw, 250, 510, 0.9, lighten(deco, 0.42))
+        draw_lantern(draw, 300, 500, 1.05, lighten(accent, 0.52), accent)
+        draw_lantern(draw, 1160, 510, 0.95, lighten(accent, 0.58), accent)
+    elif scene == "城兴":
+        draw_skyline(draw, 220, 1120, 2.0, lighten(main, 0.56))
+        draw_bridge(draw, 980, 1115, 1.8, lighten(main, 0.48))
+        draw_cloud(draw, 250, 505, 0.9, lighten(deco, 0.45))
+
+    # 大头盲盒角色
+    draw.ellipse((495, 470, 1105, 1080), fill=skin_color, outline=lighten(main, 0.62), width=4)
+    draw.pieslice((455, 395, 1140, 1035), start=180, end=360, fill=hair_color)
+    draw.rounded_rectangle((560, 610, 1045, 730), radius=55, fill=hair_color)
+
+    draw.pieslice((560, 500, 730, 730), start=15, end=180, fill=hair_color)
+    draw.pieslice((705, 470, 885, 750), start=5, end=190, fill=hair_color)
+    draw.pieslice((860, 500, 1035, 740), start=0, end=165, fill=hair_color)
+
+    draw.ellipse((470, 675, 550, 785), fill=skin_color)
+    draw.ellipse((1050, 675, 1130, 785), fill=skin_color)
+
+    draw.ellipse((655, 730, 715, 805), fill=(52, 52, 62))
+    draw.ellipse((885, 730, 945, 805), fill=(52, 52, 62))
+    draw.ellipse((673, 748, 691, 768), fill=(255, 255, 255))
+    draw.ellipse((903, 748, 921, 768), fill=(255, 255, 255))
+
+    draw.ellipse((585, 820, 685, 880), fill=(248, 194, 198))
+    draw.ellipse((915, 820, 1015, 880), fill=(248, 194, 198))
+
+    draw.arc((740, 855, 865, 925), start=10, end=170, fill=(208, 96, 108), width=5)
+
+    # 高光感
+    draw.ellipse((580, 560, 690, 670), fill=(255, 255, 255))
+    draw.ellipse((610, 590, 665, 640), fill=skin_color)
+    draw.ellipse((720, 520, 790, 580), fill=(255, 255, 255))
+    draw.ellipse((740, 535, 775, 565), fill=skin_color)
+
+    draw.rounded_rectangle((620, 1035, 980, 1350), radius=110, fill=outfit_color)
+    draw.rounded_rectangle((520, 1080, 650, 1270), radius=60, fill=outfit_color)
+    draw.rounded_rectangle((950, 1080, 1080, 1270), radius=60, fill=outfit_color)
+
+    draw.ellipse((500, 1220, 580, 1300), fill=skin_color)
+    draw.ellipse((1020, 1220, 1100, 1300), fill=skin_color)
+
+    draw.rounded_rectangle((695, 1320, 790, 1490), radius=38, fill=skin_color)
+    draw.rounded_rectangle((810, 1320, 905, 1490), radius=38, fill=skin_color)
+
+    shoe_color = darken(outfit_color, 0.2)
+    draw.rounded_rectangle((665, 1460, 805, 1540), radius=28, fill=shoe_color)
+    draw.rounded_rectangle((795, 1460, 935, 1540), radius=28, fill=shoe_color)
+
+    if scene == "山静":
+        draw_mountain(draw, 675, 400, 0.75, accent)
+        draw.rounded_rectangle((680, 1105, 920, 1165), radius=25, fill=lighten(accent, 0.22))
+    elif scene == "水生":
+        draw_wave(draw, 650, 405, 0.95, accent)
+        draw_wave(draw, 690, 1175, 0.78, lighten(accent, 0.14))
+    elif scene == "人聚":
+        draw.ellipse((735, 418, 785, 470), fill=accent)
+        draw.ellipse((780, 418, 830, 470), fill=accent)
+        draw.polygon([(725, 450), (840, 450), (782, 525)], fill=accent)
+        draw.rounded_rectangle((660, 1045, 945, 1110), radius=26, fill=lighten(accent, 0.18))
+    elif scene == "城兴":
+        draw_skyline(draw, 660, 400, 1.25, accent)
+        draw_bridge(draw, 675, 1165, 0.82, lighten(accent, 0.12))
+
+    draw.rounded_rectangle(
+        (220, 610, 390, 675),
+        radius=22,
         fill=lighten(accent, 0.8),
         outline=accent,
         width=2
     )
-    draw_centered_text(draw, (1010, 168, 1410, 228), chip_text, chip_font, main)
-
-    photo = Image.open(BytesIO(memory["image"])).convert("RGB")
-    photo_circle = circular_crop(photo, 180)
-    canvas.paste(photo_circle, (1250, 380), photo_circle)
-    draw.ellipse((1242, 372, 1438, 568), outline=accent, width=4)
-    draw.text((1260, 580), "灵感照片", font=small_font, fill=main)
+    draw_centered_text(draw, (220, 610, 390, 675), "限定主题", chip_font, main)
 
     draw.rounded_rectangle(
-        (140, 360, 1460, 1320),
-        radius=40,
-        fill=(255, 255, 255),
-        outline=rgb_hex(deco),
+        (1160, 665, 1360, 730),
+        radius=22,
+        fill=lighten(main, 0.8),
+        outline=main,
         width=2
     )
-
-    for i in range(6):
-        x = 180 + i * 200
-        draw.ellipse((x, 420, x + 70, 490), fill=lighten(deco, 0.3))
-
-    if scene == "山静":
-        draw_cloud(draw, 250, 430, 1.1, lighten(deco, 0.4))
-        draw_cloud(draw, 1080, 460, 1.0, lighten(deco, 0.4))
-        draw_mountain(draw, 260, 1090, 1.2, lighten(main, 0.55))
-        draw_mountain(draw, 980, 1080, 0.9, lighten(main, 0.65))
-    elif scene == "水生":
-        draw_wave(draw, 230, 1110, 1.6, lighten(main, 0.5))
-        draw_wave(draw, 930, 1095, 1.2, lighten(main, 0.65))
-        draw_cloud(draw, 280, 440, 1.0, lighten(deco, 0.5))
-    elif scene == "人聚":
-        draw_cloud(draw, 260, 450, 0.9, lighten(deco, 0.4))
-        draw_lantern(draw, 310, 430, 1.1, lighten(accent, 0.5), accent)
-        draw_lantern(draw, 1170, 440, 1.0, lighten(accent, 0.6), accent)
-    elif scene == "城兴":
-        draw_skyline(draw, 230, 1110, 2.2, lighten(main, 0.55))
-        draw_bridge(draw, 950, 1085, 2.0, lighten(main, 0.45))
-        draw_cloud(draw, 260, 440, 0.9, lighten(deco, 0.45))
-
-    draw.ellipse((560, 1040, 1040, 1140), fill=lighten(deco, 0.1))
-
-    draw.ellipse((555, 430, 1045, 920), fill=skin_color, outline=lighten(main, 0.6), width=3)
-    draw.pieslice((520, 360, 1080, 900), start=180, end=360, fill=hair_color)
-    draw.rounded_rectangle((580, 540, 1015, 640), radius=40, fill=hair_color)
-
-    draw.pieslice((570, 430, 720, 640), start=20, end=180, fill=hair_color)
-    draw.pieslice((690, 410, 860, 650), start=10, end=190, fill=hair_color)
-    draw.pieslice((835, 430, 1000, 650), start=0, end=170, fill=hair_color)
-
-    draw.ellipse((525, 610, 595, 715), fill=skin_color)
-    draw.ellipse((1005, 610, 1075, 715), fill=skin_color)
-
-    draw.ellipse((670, 660, 705, 700), fill=(50, 50, 60))
-    draw.ellipse((895, 660, 930, 700), fill=(50, 50, 60))
-    draw.ellipse((682, 670, 692, 680), fill=(255, 255, 255))
-    draw.ellipse((907, 670, 917, 680), fill=(255, 255, 255))
-
-    draw.ellipse((605, 735, 685, 785), fill=(248, 194, 197))
-    draw.ellipse((915, 735, 995, 785), fill=(248, 194, 197))
-
-    draw.arc((735, 770, 860, 840), start=10, end=170, fill=(200, 95, 105), width=4)
-
-    draw.rounded_rectangle((620, 920, 980, 1320), radius=95, fill=outfit_color)
-    draw.rounded_rectangle((530, 960, 650, 1180), radius=50, fill=outfit_color)
-    draw.rounded_rectangle((950, 960, 1070, 1180), radius=50, fill=outfit_color)
-
-    draw.ellipse((520, 1140, 590, 1215), fill=skin_color)
-    draw.ellipse((1010, 1140, 1080, 1215), fill=skin_color)
-
-    draw.rounded_rectangle((690, 1300, 785, 1515), radius=35, fill=skin_color)
-    draw.rounded_rectangle((815, 1300, 910, 1515), radius=35, fill=skin_color)
-
-    draw.rounded_rectangle((660, 1490, 800, 1565), radius=24, fill=darken(outfit_color, 0.18))
-    draw.rounded_rectangle((800, 1490, 940, 1565), radius=24, fill=darken(outfit_color, 0.18))
-
-    if scene == "山静":
-        draw_mountain(draw, 685, 335, 0.8, accent)
-        draw.polygon([(620, 970), (800, 1030), (980, 970), (980, 1065), (620, 1065)], fill=lighten(accent, 0.3))
-    elif scene == "水生":
-        draw_wave(draw, 655, 340, 1.0, accent)
-        draw_wave(draw, 675, 1070, 0.8, lighten(accent, 0.15))
-    elif scene == "人聚":
-        draw.ellipse((730, 355, 780, 405), fill=accent)
-        draw.ellipse((775, 355, 825, 405), fill=accent)
-        draw.polygon([(720, 385), (835, 385), (777, 455)], fill=accent)
-        draw.rounded_rectangle((655, 935, 945, 1000), radius=25, fill=lighten(accent, 0.2))
-    elif scene == "城兴":
-        draw_skyline(draw, 660, 335, 1.3, accent)
-        draw_bridge(draw, 670, 1075, 0.9, lighten(accent, 0.15))
+    draw_centered_text(draw, (1160, 665, 1360, 730), "可收藏款", chip_font, main)
 
     draw.rounded_rectangle(
-        (140, 1370, 1460, 1850),
+        (140, 1385, 1460, 1855),
         radius=38,
         fill=(255, 255, 255),
         outline=rgb_hex(deco),
         width=2
     )
 
-    draw.text((190, 1430), "IP角色设定", font=section_font, fill=main)
+    draw.text((185, 1440), "角色设定卡", font=section_font, fill=main)
 
-    identity_lines = wrap_text_by_width(draw, f"记忆身份：{identity}", text_font, 1150)
+    identity_lines = wrap_text_by_width(draw, f"记忆身份：{identity}", text_font, 1120)
     y_cursor = 1515
     for line in identity_lines[:2]:
-        draw.text((190, y_cursor), line, font=text_font, fill=(70, 85, 92))
-        y_cursor += 46
+        draw.text((185, y_cursor), line, font=text_font, fill=(70, 84, 92))
+        y_cursor += 44
 
-    quote_lines = wrap_text_by_width(draw, f"万州记忆：{quote}", text_font, 1150)
+    quote_lines = wrap_text_by_width(draw, f"角色宣言：{quote}", text_font, 1120)
     for line in quote_lines[:3]:
-        draw.text((190, y_cursor), line, font=text_font, fill=(70, 85, 92))
-        y_cursor += 46
+        draw.text((185, y_cursor), line, font=text_font, fill=(70, 84, 92))
+        y_cursor += 44
 
-    draw.text((190, 1710), "可延展为：", font=text_font, fill=main)
+    draw.text((185, 1710), "文创延展：", font=text_font, fill=main)
 
-    chips = ["明信片主角", "文创贴纸", "徽章挂件", "表情包", "礼盒插卡"]
-    chip_x = 190
-    chip_y = 1770
-    chip_w = 185
+    chips = ["盲盒公仔", "文创贴纸", "徽章挂件", "主题明信片", "礼盒封套"]
+    chip_x = 185
+    chip_y = 1765
+    chip_w = 190
     chip_h = 54
     gap = 18
 
@@ -552,8 +609,7 @@ def create_local_ip_image(memory):
             main
         )
 
-    draw.text((190, 1888), "说明：当前为本地版模板生成，不调用外部AI模型。", font=small_font, fill=(120, 128, 135))
-    draw.text((190, 1915), "Wanzhou Cute Cultural IP Generator", font=small_font, fill=accent)
+    draw.text((185, 1885), "Blind Box Style Character · Local Generated Edition", font=small_font, fill=accent)
 
     buffer = BytesIO()
     canvas.save(buffer, format="PNG", optimize=True)
@@ -562,7 +618,7 @@ def create_local_ip_image(memory):
 
 
 # ==========================
-# 高清明信片生成函数：支持自动放入IP
+# IP 联名明信片生成函数
 # ==========================
 
 def create_memory_card(memory, stamps, ip_bytes=None):
@@ -578,6 +634,7 @@ def create_memory_card(memory, stamps, ip_bytes=None):
     line_color = "#D8D1C6"
     pale_green = "#EAF4F2"
     pale_orange = "#FFF3E8"
+    pale_blue = "#EDF6FB"
     white = "#FFFFFF"
 
     card = Image.new("RGB", (card_w, card_h), bg_color)
@@ -630,7 +687,7 @@ def create_memory_card(memory, stamps, ip_bytes=None):
 
     draw.text(
         (214, 295),
-        "我的万州山水记忆明信片",
+        "我的万州山水记忆联名卡",
         font=sub_font,
         fill=orange
     )
@@ -674,21 +731,21 @@ def create_memory_card(memory, stamps, ip_bytes=None):
 
     if ip_bytes is not None:
         ip_img = Image.open(BytesIO(ip_bytes)).convert("RGB")
-        ip_img = ImageOps.fit(ip_img, (330, 410), method=Image.Resampling.LANCZOS)
-        ip_img = add_rounded_corners(ip_img, radius=26)
+        ip_img = ImageOps.fit(ip_img, (360, 430), method=Image.Resampling.LANCZOS)
+        ip_img = add_rounded_corners(ip_img, radius=28)
 
         draw.rounded_rectangle(
-            (1240, 620, 1600, 1070),
-            radius=32,
+            (1215, 605, 1615, 1090),
+            radius=34,
             fill=(255, 255, 255),
             outline=orange,
             width=4
         )
 
-        card.paste(ip_img, (1255, 640), ip_img)
+        card.paste(ip_img, (1235, 625), ip_img)
 
         draw.rounded_rectangle(
-            (1270, 1010, 1585, 1060),
+            (1260, 1012, 1570, 1064),
             radius=18,
             fill=pale_orange,
             outline=orange,
@@ -696,8 +753,8 @@ def create_memory_card(memory, stamps, ip_bytes=None):
         )
         draw_centered_text(
             draw,
-            (1270, 1010, 1585, 1060),
-            "专属IP已联名",
+            (1260, 1012, 1570, 1064),
+            "盲盒潮玩IP联名",
             small_font,
             orange
         )
@@ -792,22 +849,16 @@ def create_memory_card(memory, stamps, ip_bytes=None):
 
     draw.text(
         (1045, 1285),
-        "万州寄语",
+        "联名寄语",
         font=section_font,
         fill=dark_green
     )
 
-    if ip_bytes is not None:
-        quote_lines = [
-            "照片生成记忆，",
-            "IP成为主角，",
-            "万州故事被带回生活。"
-        ]
-    else:
-        quote_lines = [
-            "数字交互让文化被体验，",
-            "共创记忆让万州被更多人共同讲述。"
-        ]
+    quote_lines = [
+        "照片生成记忆，",
+        "潮玩IP成为主角，",
+        "万州故事被带回生活。"
+    ]
 
     quote_y = 1368
     for line in quote_lines:
@@ -819,8 +870,19 @@ def create_memory_card(memory, stamps, ip_bytes=None):
         )
         quote_y += 58
 
-    line_start_y = 1570
-    for i in range(6):
+    draw.rounded_rectangle(
+        (1035, 1540, 1600, 1715),
+        radius=24,
+        fill=pale_blue,
+        outline=line_color,
+        width=2
+    )
+    draw.text((1060, 1572), "联名属性", font=small_font, fill=dark_green)
+    draw.text((1060, 1618), "· 万州山水记忆", font=small_font, fill=deep_text)
+    draw.text((1060, 1658), "· 盲盒潮玩IP", font=small_font, fill=deep_text)
+
+    line_start_y = 1788
+    for i in range(4):
         y = line_start_y + i * 88
         draw.line(
             (1045, y, 1590, y),
@@ -1169,13 +1231,13 @@ else:
 
 
 # ==========================
-# 生成专属IP形象
+# 第一步：生成盲盒潮玩风 IP
 # ==========================
 
 st.markdown("---")
-st.markdown("## 🎨 第一步：生成我的万州专属IP形象")
+st.markdown("## 🎨 第一步：生成我的万州专属IP形象（盲盒潮玩风）")
 st.write(
-    "先生成一个可爱的 Q 版万州文旅角色。生成后，它会自动联动到后续明信片中，成为你的个人文创主角。"
+    "先生成一个盲盒潮玩风的万州专属IP形象。生成后，它会自动联动到后续明信片中，成为你的个人文创主角。"
 )
 
 selected_ip_index = None
@@ -1187,7 +1249,7 @@ if st.session_state.memories:
     ]
 
     selected_ip_label = st.selectbox(
-        "请选择一条记忆生成专属IP形象",
+        "请选择一条记忆生成盲盒潮玩IP",
         ip_options,
         key="ip_select"
     )
@@ -1195,40 +1257,40 @@ if st.session_state.memories:
     selected_ip_index = ip_options.index(selected_ip_label)
     selected_ip_memory = st.session_state.memories[selected_ip_index]
 
-    if st.button("生成本地版专属IP", key="generate_local_ip"):
-        ip_bytes = create_local_ip_image(selected_ip_memory)
+    if st.button("生成盲盒潮玩版IP", key="generate_local_ip"):
+        ip_bytes = create_blindbox_ip_image(selected_ip_memory)
         st.session_state.generated_ip_bytes = ip_bytes
         st.session_state.generated_ip_index = selected_ip_index
         st.session_state.generated_card_bytes = None
-        st.success("本地版专属IP形象已生成。后续生成明信片时会自动放入。")
+        st.success("盲盒潮玩版IP形象已生成。后续生成明信片时会自动放入。")
 
     if st.session_state.generated_ip_bytes is not None:
-        st.markdown("### 专属IP预览")
+        st.markdown("### 盲盒潮玩IP预览")
         st.image(st.session_state.generated_ip_bytes, width=620)
 
         if st.session_state.generated_ip_index == selected_ip_index:
-            st.success("当前IP与所选记忆匹配，可自动联动到明信片。")
+            st.success("当前盲盒IP与所选记忆匹配，可自动联动到明信片。")
         else:
-            st.warning("当前预览IP来自另一条记忆。重新点击“生成本地版专属IP”即可匹配当前记忆。")
+            st.warning("当前预览IP来自另一条记忆。重新点击“生成盲盒潮玩版IP”即可匹配当前记忆。")
 
         st.download_button(
-            label="下载 PNG 专属IP形象",
+            label="下载 PNG 盲盒潮玩IP形象",
             data=st.session_state.generated_ip_bytes,
-            file_name="万州专属IP形象_本地版.png",
+            file_name="万州专属IP形象_盲盒潮玩版.png",
             mime="image/png"
         )
 else:
-    st.info("请先上传至少一条照片记忆，再生成专属IP形象。")
+    st.info("请先上传至少一条照片记忆，再生成盲盒潮玩IP形象。")
 
 
 # ==========================
-# 生成联名明信片
+# 第二步：生成联名明信片
 # ==========================
 
 st.markdown("---")
-st.markdown("## 🖼 第二步：生成IP联名版万州山水记忆明信片")
+st.markdown("## 🖼 第二步：生成盲盒潮玩IP联名版万州山水记忆明信片")
 st.write(
-    "如果你已经生成了专属IP形象，系统会自动把IP形象放入明信片，形成“照片 + 记忆 + 印章 + 专属IP”的联名款。"
+    "如果你已经生成了盲盒潮玩IP形象，系统会自动把IP形象放入明信片，形成“照片 + 记忆 + 印章 + 潮玩IP”的联名收藏款。"
 )
 
 if st.session_state.memories:
@@ -1238,7 +1300,7 @@ if st.session_state.memories:
     ]
 
     selected_memory_label = st.selectbox(
-        "请选择一条记忆生成明信片",
+        "请选择一条记忆生成联名明信片",
         memory_options,
         key="postcard_select"
     )
@@ -1253,32 +1315,32 @@ if st.session_state.memories:
         and st.session_state.generated_ip_index == selected_index
     ):
         matched_ip_bytes = st.session_state.generated_ip_bytes
-        st.success("检测到匹配的专属IP：生成明信片时将自动放入。")
+        st.success("检测到匹配的盲盒潮玩IP：生成明信片时将自动放入。")
     else:
-        st.info("当前没有匹配的专属IP。也可以直接生成普通高清明信片。")
+        st.info("当前没有匹配的盲盒潮玩IP。你也可以先生成IP，再回来制作联名明信片。")
 
-    if st.button("生成IP联名版高清明信片", key="generate_card"):
+    if st.button("生成盲盒潮玩联名明信片", key="generate_card"):
         card_bytes = create_memory_card(
             selected_memory,
             st.session_state.stamps,
             ip_bytes=matched_ip_bytes
         )
         st.session_state.generated_card_bytes = card_bytes
-        st.success("高清明信片已生成。")
+        st.success("盲盒潮玩联名明信片已生成。")
 
     if st.session_state.generated_card_bytes is not None:
-        st.markdown("### 明信片预览")
+        st.markdown("### 联名明信片预览")
         st.image(st.session_state.generated_card_bytes, width=700)
         st.caption("页面预览会被缩放，下载后的 PNG 会比当前预览更清晰。")
 
         st.download_button(
-            label="下载 PNG 高清明信片",
+            label="下载 PNG 盲盒潮玩联名明信片",
             data=st.session_state.generated_card_bytes,
-            file_name="万州山水记忆明信片_IP联名版.png",
+            file_name="万州山水记忆明信片_盲盒潮玩联名版.png",
             mime="image/png"
         )
 else:
-    st.info("请先上传至少一条照片记忆，再生成明信片。")
+    st.info("请先上传至少一条照片记忆，再生成联名明信片。")
 
 
 # ==========================
@@ -1290,7 +1352,7 @@ st.markdown(
 <div class="bottom-text">
     从山水到人群，从历史到今日，万州的风华不是单一景点的呈现，<br>
     而是<span class="highlight">山、水、人、城</span>共同生长的结果。<br>
-    数字交互让文化被体验，共创记忆让万州被更多人共同讲述，专属IP让万州记忆拥有更鲜明的可爱表达。
+    数字交互让文化被体验，共创记忆让万州被更多人共同讲述，盲盒潮玩IP让万州记忆拥有更鲜明的收藏表达。
 </div>
 """,
     unsafe_allow_html=True
